@@ -1,10 +1,10 @@
-# 🛍️ ShopClone — Production-Ready E-Commerce Platform
+# ShopClone — Production-Ready E-Commerce Platform
 
 A full-stack e-commerce application with Next.js frontend, Express backend, PostgreSQL database, Stripe payments, and Docker deployment.
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 e-commerce/
@@ -15,7 +15,7 @@ e-commerce/
 └── README.md
 ```
 
-## ✨ Features
+## Features
 
 | Feature      | Details                                          |
 | ------------ | ------------------------------------------------ |
@@ -30,7 +30,7 @@ e-commerce/
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## Quick Start (Local Development)
 
 ### Prerequisites
 
@@ -112,7 +112,7 @@ npm run dev
 
 ---
 
-## 🐳 Docker Deployment
+##  Docker Deployment
 
 ### 1. Configure production .env
 
@@ -151,7 +151,7 @@ docker-compose exec backend npm run prisma:seed
 
 ---
 
-## 💳 Stripe Configuration
+## Stripe Configuration
 
 ### Test Mode Setup
 
@@ -186,7 +186,7 @@ Use any future expiry date, any CVC, any postal code.
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ```bash
 cd backend
@@ -205,7 +205,7 @@ Tests cover:
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 ### Base URL: `http://localhost:4000/api`
 
@@ -264,7 +264,7 @@ Tests cover:
 
 ---
 
-## 🔐 Security
+## Security
 
 - **Passwords**: bcrypt with 12 rounds
 - **Tokens**: Short-lived JWT (15m) + rotating refresh tokens (7d)
@@ -277,7 +277,7 @@ Tests cover:
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 | Layer    | Technology                                    |
 | -------- | --------------------------------------------- |
