@@ -112,7 +112,7 @@ npm run dev
 
 ---
 
-##  Docker Deployment
+## Docker Deployment
 
 ### 1. Configure production .env
 
