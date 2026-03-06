@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Search, SlidersHorizontal, X, ChevronDown } from "lucide-react";
+import { useEffect, useState, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { Search, SlidersHorizontal } from "lucide-react";
 import ProductCard from "@/components/product/ProductCard";
 import api from "@/lib/api";
 
@@ -32,9 +32,9 @@ const SORT_OPTIONS = [
   { value: "rating", label: "Top Rated" },
 ];
 
-export default function ProductsPage() {
+// Inner component uses useSearchParams — must be wrapped in Suspense
+function ProductsInner() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -78,7 +78,6 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-
   useEffect(() => {
     api.get("/categories").then(({ data }) => setCategories(data.data));
   }, []);
@@ -120,8 +119,7 @@ export default function ProductsPage() {
             onClick={() => setShowFilters(!showFilters)}
             className="btn-secondary btn-sm flex items-center gap-2"
           >
-            <SlidersHorizontal className="w-4 h-4" />
-            Filters
+            <SlidersHorizontal className="w-4 h-4" /> Filters
           </button>
           <select
             value={filters.sort}
@@ -138,7 +136,7 @@ export default function ProductsPage() {
       </div>
 
       <div className="flex gap-8">
-        {/* Filters Sidebar */}
+        {/* Sidebar */}
         <aside
           className={`${showFilters ? "block" : "hidden"} lg:block w-full lg:w-64 flex-shrink-0`}
         >
@@ -153,7 +151,6 @@ export default function ProductsPage() {
               </button>
             </div>
 
-            {/* Search */}
             <div>
               <label className="label">Search</label>
               <div className="relative">
@@ -168,29 +165,27 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            {/* Category */}
             <div>
               <label className="label">Category</label>
               <div className="space-y-2">
                 <div
                   onClick={() => updateFilter("category", "")}
-                  className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer text-sm transition-all ${!filters.category ? "bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                  className={`px-3 py-2 rounded-xl cursor-pointer text-sm transition-all ${!filters.category ? "bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                 >
-                  <span>All Categories</span>
+                  All Categories
                 </div>
                 {categories.map((cat) => (
                   <div
                     key={cat.id}
                     onClick={() => updateFilter("category", cat.slug)}
-                    className={`flex items-center justify-between px-3 py-2 rounded-xl cursor-pointer text-sm transition-all ${filters.category === cat.slug ? "bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`px-3 py-2 rounded-xl cursor-pointer text-sm transition-all ${filters.category === cat.slug ? "bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                   >
-                    <span>{cat.name}</span>
+                    {cat.name}
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Price Range */}
             <div>
               <label className="label">Price Range</label>
               <div className="flex items-center gap-2">
@@ -212,7 +207,6 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            {/* Min Rating */}
             <div>
               <label className="label">Min Rating</label>
               <div className="space-y-1">
@@ -220,7 +214,7 @@ export default function ProductsPage() {
                   <div
                     key={r}
                     onClick={() => updateFilter("minRating", String(r))}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer text-sm transition-all ${filters.minRating === String(r) ? "bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`px-3 py-2 rounded-xl cursor-pointer text-sm transition-all ${filters.minRating === String(r) ? "bg-primary-50 dark:bg-primary-950 text-primary-700 dark:text-primary-300 font-semibold" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                   >
                     {"★".repeat(r)}
                     {"☆".repeat(5 - r)} & up
@@ -265,8 +259,6 @@ export default function ProductsPage() {
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
-
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-12">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map(
@@ -287,5 +279,31 @@ export default function ProductsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Suspense wrapper — required because ProductsInner uses useSearchParams()
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="section">
+          <div className="skeleton h-10 w-48 mb-8 rounded-xl" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="rounded-2xl overflow-hidden">
+                <div className="skeleton aspect-square" />
+                <div className="p-4 space-y-3">
+                  <div className="skeleton h-4 w-3/4" />
+                  <div className="skeleton h-4 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <ProductsInner />
+    </Suspense>
   );
 }
