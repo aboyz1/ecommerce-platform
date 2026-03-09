@@ -23,6 +23,12 @@ import adminRoutes from "./routes/admin.routes";
 
 const app = express();
 
+// ─── Trust Proxy (required for Render / any reverse-proxy host) ─────────────
+// Render sits behind a load balancer that sets X-Forwarded-For.
+// Without this, express-rate-limit throws ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+// and req.ip returns the proxy IP instead of the real client IP.
+app.set("trust proxy", 1);
+
 // ─── Security Middleware ────────────────────────────────────────────────────
 app.use(
   helmet({
